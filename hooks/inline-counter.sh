@@ -22,7 +22,7 @@ def main():
     session_id = payload.get("session_id") or "default"
 
     inline_tools = {"Bash", "Read", "Grep", "Glob", "Edit", "Write", "NotebookEdit"}
-    reset_tools = {"Agent", "Task"}
+    reset_tools = {"Agent", "Task", "Workflow"}
 
     if tool_name not in inline_tools and tool_name not in reset_tools:
         return

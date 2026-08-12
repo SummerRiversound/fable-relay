@@ -100,7 +100,7 @@ def _guard(data):
     if str(tool_input.get("subagent_type") or "").strip().lower() == "fork":
         return
 
-    text = tool_input.get("prompt")
+    text = tool_input.get("prompt") or tool_input.get("script") or ""
     if not isinstance(text, str):
         text = ""
 

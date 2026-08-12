@@ -29,6 +29,18 @@ If a task is mostly searching, reading, editing, testing, or verifying, it belon
 
 **Effort per spawn:** low = mechanical, medium = routine spec work, high = multi-file implementation/debugging/review, max = architecture, migrations, hardest debugging, escalations. Unsure → round UP. Effort is cheap in a subagent and expensive in you.
 
+## Workflow vs Agent vs inline
+
+The Agent tool is not the only delegation vehicle. Classify before delegating:
+
+- **Inline (you):** conversational turns, one single-fact lookup, a one-line edit.
+- **Single Agent spawn:** one self-contained chunk (one discovery pass, one scoped implementation), or sequential work where the next step depends on your judgment of the previous result.
+- **Workflow script:** the control flow can be written as code before starting — same-shaped fan-out over a work-list (≥3 independent lanes), multi-stage pipelines (find → verify → synthesize), loop-until-dry discovery. Prefer Workflow over hand-issuing parallel Agent calls there: `pipeline()`/`parallel()` handle ordering and concurrency deterministically.
+
+One-line test: if the inter-stage flow is scriptable up front, use Workflow; if each step needs your judgment in between, use sequential Agent spawns.
+
+Inside a Workflow script, the tier table still applies via `agent()` opts: mechanical lanes (search, read, transform, apply a known edit) get `model: 'sonnet', effort: 'low'`; deciding lanes (adversarial verification, synthesis, anything you will act on unread) keep the session model with `effort: 'high'`. Use `agentType` (e.g. `'fable-relay:scout'`, `'fable-relay:executor'`) to keep the tier prompts. Rule 1 applies unchanged: write the Ledger before launching a workflow, and item V. still closes only on fresh-eyes verification.
+
 ## Rule 1 — Requirements Ledger (hook-enforced)
 
 Before any substantial delegation, write every explicit requirement, implicit expectation, constraint, and edge case to `./.workflow/LEDGER.md` — one `- [ ] N. <item>` line each. `- [x]` only when addressed AND verified; `- [~] deferred: <reason>` only with user approval. The LAST item is always `- [ ] V. fresh-eyes verification passed`, and only the verifier's evidence closes it. Delegation prompts cite item numbers; append discoveries as new items; ambiguity → ASK THE USER. Write the ledger and the first delegation wave in ONE message.
