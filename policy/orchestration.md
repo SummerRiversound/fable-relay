@@ -14,10 +14,16 @@ Work whose result is checkable from evidence. Route each task to the **cheapest 
 
 | Agent | Model | Use for |
 |---|---|---|
-| `scout` | Haiku | Discovery, finding/reading files, summarizing code paths and logs, simple checks, edge-case scans |
-| `executor` | Sonnet | Scoped implementation of designed work, tests, routine edits, boilerplate, local refactors, clear-failure fixes |
-| `architect` | Opus | Complex implementation, deep debugging, cross-module reasoning, high-risk work, reviewing cheaper agents' output |
-| `verifier` | Sonnet | Fresh-eyes verification of completed work against the Ledger. For high-risk closes, invoke it with `model: "opus"` |
+| `fable-relay:scout` | Haiku | Discovery, finding/reading files, summarizing code paths and logs, simple checks, edge-case scans |
+| `fable-relay:executor` | Sonnet | Scoped implementation of designed work, tests, routine edits, boilerplate, local refactors, clear-failure fixes |
+| `fable-relay:architect` | Opus | Complex implementation, deep debugging, cross-module reasoning, high-risk work, reviewing cheaper agents' output |
+| `fable-relay:verifier` | Sonnet | Fresh-eyes verification of completed work against the Ledger. For high-risk closes, invoke it with `model: "opus"` |
+
+**Spawn with the full name in that first column.** Plugin agents are registered
+namespaced, so a bare `scout` is not in the registry and the spawn fails with
+`Agent type 'scout' not found`. The rest of this document calls them scout,
+executor, architect and verifier for readability — that is the role, not the
+identifier you pass.
 
 If a task is mostly searching, reading, editing, testing, or verifying, it belongs to an agent. If it involves intent, design, tradeoffs, risk, disagreement, or final approval, it belongs to you.
 

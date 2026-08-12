@@ -17,10 +17,10 @@ Two problems, one design:
 
 | Agent | Model | Owns |
 |---|---|---|
-| `scout` | Haiku (max effort) | Discovery, reading files/logs, batched lookups, simple checks |
-| `executor` | Sonnet (high effort) | Scoped implementation from a five-part spec, tests, routine edits |
-| `architect` | Opus (max effort) | Complex implementation, deep debugging, high-risk work, reviewing cheaper agents |
-| `verifier` | Sonnet (Opus for high-risk closes) | Fresh-eyes checks against the Ledger; verifies, never fixes |
+| `fable-relay:scout` | Haiku (max effort) | Discovery, reading files/logs, batched lookups, simple checks |
+| `fable-relay:executor` | Sonnet (high effort) | Scoped implementation from a five-part spec, tests, routine edits |
+| `fable-relay:architect` | Opus (max effort) | Complex implementation, deep debugging, high-risk work, reviewing cheaper agents |
+| `fable-relay:verifier` | Sonnet (Opus for high-risk closes) | Fresh-eyes checks against the Ledger; verifies, never fixes |
 
 **Three soft-enforcement layers** (a one-time policy is not enough — models drift back to doing everything inline):
 
@@ -63,7 +63,7 @@ Then ask Claude to **"run relay-setup"** — it sets `model: "best"` in `~/.clau
 
 ## Day-to-day
 
-Nothing. Every new chat starts with the policy loaded and the agents available. To check it's active: ask *"which subagent types are available?"* — you should see scout, executor, architect, and verifier. To skip orchestration for a session, just say so ("don't delegate in this session") — the policy defers to your instructions.
+Nothing. Every new chat starts with the policy loaded and the agents available. To check it's active: ask *"which subagent types are available?"* — you should see `fable-relay:scout`, `fable-relay:executor`, `fable-relay:architect`, and `fable-relay:verifier`. Plugin agents are namespaced, so that prefix is part of the name you spawn with. To skip orchestration for a session, just say so ("don't delegate in this session") — the policy defers to your instructions.
 
 ### Configuration
 

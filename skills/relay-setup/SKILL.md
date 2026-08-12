@@ -20,4 +20,4 @@ Configure the one thing a plugin cannot set by itself: the default session model
    - `hooks/hooks.json` plus the three shell hooks and the two Python guard scripts
    - `python3` available on PATH (the guard hooks need it)
 
-5. **Report.** Tell the user: what was changed, where the backup is, and that a session restart is needed for the model change and the SessionStart policy injection to take effect. Suggest the smoke test: ask "which subagent types are available?" in the new session — scout, executor, architect, and verifier should appear.
+5. **Report.** Tell the user: what was changed, where the backup is, and that a session restart is needed for the model change and the SessionStart policy injection to take effect. Suggest the smoke test: ask "which subagent types are available?" in the new session — `fable-relay:scout`, `fable-relay:executor`, `fable-relay:architect`, and `fable-relay:verifier` should appear. The namespace prefix is part of the name to spawn with.
