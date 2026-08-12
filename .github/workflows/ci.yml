@@ -1,0 +1,45 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON manifests
+        run: |
+          python3 -m json.tool .claude-plugin/plugin.json > /dev/null
+          python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
+          python3 -m json.tool hooks/hooks.json > /dev/null
+      - name: Guard hook behavioral tests
+        run: |
+          set -e
+          mkdir -p /tmp/p/.workflow && cd /tmp/p && git init -q .
+          # spawn guard: long prompt + no ledger -> deny
+          rm -rf /tmp/p/.workflow && mkdir -p /tmp/p
+          echo "{\"tool_name\":\"Task\",\"session_id\":\"ci\",\"cwd\":\"/tmp/p\",\"tool_input\":{\"prompt\":\"$(printf 'x%.0s' $(seq 1 2000))\"}}" \
+            | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_spawn.py | grep -q '"deny"'
+          # spawn guard: ledger present -> silent
+          mkdir -p /tmp/p/.workflow && printf -- '- [ ] 1. item\n' > /tmp/p/.workflow/LEDGER.md
+          out=$(echo "{\"tool_name\":\"Task\",\"session_id\":\"ci\",\"cwd\":\"/tmp/p\",\"tool_input\":{\"prompt\":\"$(printf 'x%.0s' $(seq 1 2000))\"}}" \
+            | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_spawn.py)
+          test -z "$out"
+          # stop guard: open item -> block, second stop -> silent
+          echo '{"session_id":"ci-stop","cwd":"/tmp/p","stop_hook_active":false}' \
+            | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_stop.py | grep -q '"block"'
+          out=$(echo '{"session_id":"ci-stop","cwd":"/tmp/p","stop_hook_active":false}' \
+            | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_stop.py)
+          test -z "$out"
+          # inline counter: fires at 4
+          for i in 1 2 3 4; do
+            last=$(echo '{"tool_name":"Read","session_id":"ci-cnt"}' | bash $GITHUB_WORKSPACE/hooks/inline-counter.sh)
+          done
+          echo "$last" | grep -q '4 consecutive'
+          echo "all guard tests passed"
+      - name: SessionStart injection renders
+        run: |
+          export CLAUDE_PLUGIN_ROOT=$GITHUB_WORKSPACE
+          echo '{"session_id":"ci-ss","model":"claude-fable-5"}' | bash hooks/session-start.sh | grep -q "Orchestration policy"
+          echo '{"session_id":"ci-ss2","model":"claude-opus-4-8"}' | bash hooks/session-start.sh | grep -q "adaptation: Opus"

@@ -1,0 +1,13 @@
+{
+  "name": "fable-relay",
+  "owner": {
+    "name": "SummerRiversound"
+  },
+  "plugins": [
+    {
+      "name": "fable-relay",
+      "source": "./",
+      "description": "Fable 5 as a token-frugal orchestrator with tiered agents, ledger guard hooks, and fresh-eyes verification."
+    }
+  ]
+}
