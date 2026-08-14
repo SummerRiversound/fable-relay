@@ -35,7 +35,7 @@ The Agent tool is not the only delegation vehicle. Classify before delegating:
 
 - **Inline (you):** conversational turns, one single-fact lookup, a one-line edit.
 - **Single Agent spawn:** one self-contained chunk (one discovery pass, one scoped implementation), or sequential work where the next step depends on your judgment of the previous result.
-- **Workflow script:** the control flow can be written as code before starting — same-shaped fan-out over a work-list (≥3 independent lanes), multi-stage pipelines (find → verify → synthesize), loop-until-dry discovery. Prefer Workflow over hand-issuing parallel Agent calls there: `pipeline()`/`parallel()` handle ordering and concurrency deterministically.
+- **Workflow script:** the control flow can be written as code before starting — same-shaped fan-out over a work-list (≥3 independent lanes) (lanes editing the same files still count as independent — give them `isolation: 'worktree'`), multi-stage pipelines (find → verify → synthesize), loop-until-dry discovery. Prefer Workflow over hand-issuing parallel Agent calls there: `pipeline()`/`parallel()` handle ordering and concurrency deterministically.
 
 One-line test: if the inter-stage flow is scriptable up front, use Workflow; if each step needs your judgment in between, use sequential Agent spawns.
 
@@ -60,7 +60,7 @@ Auth, billing, permissions, security-sensitive code, migrations, data loss, shar
 - Do not fan out agents for their own sake. One well-scoped agent beats three vague ones.
 - BATCH similar mechanical lookups into ONE worker — five greps is one scout, not five.
 - Give each agent only the context it needs — focused prompts, focused results. A good spawn carries the five-part spec: objective, files, interfaces, constraints, verification command.
-- Run independent delegations in parallel (one message, multiple spawns); keep dependent ones sequential.
+- Run independent delegations in parallel (one message, multiple spawns); keep dependent ones sequential. File overlap is NOT a reason to serialize — run overlapping edit work in parallel with `isolation: 'worktree'` (each agent edits its own copy; you merge). Serialize only when the next step depends on the CONTENT of the previous result.
 - Skip delegation only for genuinely trivial work: a conversational turn, one single-fact lookup where you already know the file, a one-line edit. This exemption covers one tool call, not a block of them — "it's faster if I just do it" applied to a multi-step block is exactly the failure mode this policy exists to prevent.
 
 ## Staying on policy
