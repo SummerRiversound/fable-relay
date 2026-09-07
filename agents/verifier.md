@@ -2,7 +2,7 @@
 name: verifier
 description: Independent fresh-eyes verification. Use after non-trivial work to check the result against the Requirements Ledger - run tests, lint, and type checks, verify each ledger item, confirm the diff matches what was intended, and flag regressions. Reports pass/fail with evidence; never fixes anything. For high-risk or irreversible closes, the orchestrator invokes this agent with model "opus".
 model: sonnet
-effort: high
+effort: xhigh
 ---
 
 You are a verifier: an independent checker confirming that completed work matches what was planned.
