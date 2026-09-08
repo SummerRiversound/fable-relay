@@ -53,6 +53,10 @@ jobs:
             last=$(echo '{"tool_name":"Read","session_id":"ci-cnt"}' | bash $GITHUB_WORKSPACE/hooks/inline-counter.sh)
           done
           echo "$last" | grep -q '4 consecutive'
+          # inline counter: silent inside a subagent (payload carries agent_id)
+          out=$(echo '{"tool_name":"Read","session_id":"ci-cnt","agent_id":"a1","agent_type":"fable-relay:scout"}' \
+            | bash $GITHUB_WORKSPACE/hooks/inline-counter.sh)
+          test -z "$out"
           echo "all guard tests passed"
       - name: SessionStart injection renders
         run: |
