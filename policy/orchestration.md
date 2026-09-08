@@ -61,6 +61,7 @@ Auth, billing, permissions, security-sensitive code, migrations, data loss, shar
 - BATCH similar mechanical lookups into ONE worker — five greps is one scout, not five.
 - Give each agent only the context it needs — focused prompts, focused results. A good spawn carries the five-part spec: objective, files, interfaces, constraints, verification command.
 - Run independent delegations in parallel (one message, multiple spawns); keep dependent ones sequential. File overlap is NOT a reason to serialize — run overlapping edit work in parallel with `isolation: 'worktree'` (each agent edits its own copy; you merge). Serialize only when the next step depends on the CONTENT of the previous result.
+- Producers run only the targeted tests while iterating and the full gate once at the end, saving its output to `./.workflow/scratch/` so the verifier reads it instead of re-running it.
 - Skip delegation only for genuinely trivial work: a conversational turn, one single-fact lookup where you already know the file, a one-line edit. This exemption covers one tool call, not a block of them — "it's faster if I just do it" applied to a multi-step block is exactly the failure mode this policy exists to prevent.
 
 ## Staying on policy
@@ -70,9 +71,16 @@ Auth, billing, permissions, security-sensitive code, migrations, data loss, shar
 - **After compaction or a long stretch of work, this policy still applies.** The per-prompt reminder is your cue to re-check. The ledger and scratch files are your recovery points — re-read them instead of trusting your memory of the conversation.
 - The user can suspend orchestration anytime by saying so (e.g. "don't delegate in this session"); their instructions win over this policy.
 
-## Verification — mandatory before closing
+## Verification — before closing
 
-EVERY non-trivial close gets a FRESH verifier that did not build the work; only its evidence closes item `V.`. The producer's summary is never proof — the verifier checks against the Ledger, not against what the author says. High-risk / irreversible / largest closes run the verifier on `model: "opus"` at max effort. Findings become new ledger items and new phases; re-verify; CAP 3 cycles, then report open items to the user honestly.
+Only a FRESH verifier that did not build the work closes item `V.`; the producer's summary is never proof, and the verifier checks against the Ledger, not against what the author says. Spawn one where fresh eyes have something to read:
+
+- **A repo diff, or a document whose claims cite evidence** (review drafts, audit reports, design docs). A code diff of ~300 lines or more, and anything in a high-risk area at any size, gets a verifier. Under ~300 lines, outside high-risk areas, with the producer's gate already green: skip the verifier and read the diff yourself.
+- **External state is not verifier work.** Notion pages, issue registration, plugin lists, clone and setup steps — check those yourself with a few commands, or send a `scout` with a checklist. There is no diff for fresh eyes to read.
+- **Never re-run a green gate.** The verifier reads the gate output the producer saved to `./.workflow/scratch/`, and runs a gate itself only where the producer left no evidence of one.
+- **Re-verification is scoped to the findings** — the changed files and items only, on `model: "sonnet"`, with no gate re-run. Findings become new ledger items; CAP 3 cycles, then report open items to the user honestly.
+- **One verifier per task, and one per Workflow lane.** A Workflow loop checks each pass with the gate result plus a checklist diff, and spends a full verifier only on the final loop or on a loop whose diff is ~300 lines or more.
+- High-risk / irreversible / largest closes still run the verifier on `model: "opus"` at max effort.
 
 ## Operating loop
 
@@ -81,7 +89,7 @@ EVERY non-trivial close gets a FRESH verifier that did not build the work; only 
 3. Spawn agents to gather facts or do scoped work (parallel where independent).
 4. Review their evidence — evidence, not summaries. An empty diff is never "complete".
 5. Make the important decisions yourself.
-6. Fresh-eyes verify (`verifier`; opus for high-risk).
+6. Fresh-eyes verify if the close qualifies (see Verification); opus for high-risk.
 7. Close ledger items with evidence, then answer the user briefly.
 
 ## Final gate

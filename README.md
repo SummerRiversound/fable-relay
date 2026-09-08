@@ -2,7 +2,7 @@
 
 **Fable 5 holds the baton. The ledger keeps the score. Fresh eyes call the finish.**
 
-A Claude Code plugin that makes Fable 5 a token-frugal orchestrator. The chair keeps the judgment — intent, architecture, decomposition, tradeoffs, final review — running at low-to-medium effort. Tiered subagents on Opus, Sonnet, and Haiku do the labor at whatever effort the task demands. A hook-enforced Requirements Ledger stops silent detail loss, and every non-trivial close gets fresh-eyes verification.
+A Claude Code plugin that makes Fable 5 a token-frugal orchestrator. The chair keeps the judgment — intent, architecture, decomposition, tradeoffs, final review — running at low-to-medium effort. Tiered subagents on Opus, Sonnet, and Haiku do the labor at whatever effort the task demands. A hook-enforced Requirements Ledger stops silent detail loss, and every close with a diff worth checking gets fresh-eyes verification.
 
 ## Why
 
@@ -21,6 +21,8 @@ Two problems, one design:
 | `fable-relay:executor` | Sonnet (high effort) | Scoped implementation from a five-part spec, tests, routine edits |
 | `fable-relay:architect` | Opus (max effort) | Complex implementation, deep debugging, high-risk work, reviewing cheaper agents |
 | `fable-relay:verifier` | Sonnet (Opus for high-risk closes) | Fresh-eyes checks against the Ledger; verifies, never fixes |
+
+**Verification is scoped, not automatic.** A fresh verifier runs on a repo diff of ~300 lines or more, on anything high-risk at any size, and on documents whose claims cite evidence. Smaller green-gated diffs close on the chair reading the diff, and external state (issue lists, setup steps) is checked with a few commands instead. The verifier reads the producer's saved gate output rather than re-running it.
 
 **Three soft-enforcement layers** (a one-time policy is not enough — models drift back to doing everything inline):
 
