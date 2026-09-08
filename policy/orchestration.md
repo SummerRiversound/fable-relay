@@ -61,6 +61,7 @@ Auth, billing, permissions, security-sensitive code, migrations, data loss, shar
 - BATCH similar mechanical lookups into ONE worker — five greps is one scout, not five.
 - Give each agent only the context it needs — focused prompts, focused results. A good spawn carries the five-part spec: objective, files, interfaces, constraints, verification command.
 - Run independent delegations in parallel (one message, multiple spawns); keep dependent ones sequential. File overlap is NOT a reason to serialize — run overlapping edit work in parallel with `isolation: 'worktree'` (each agent edits its own copy; you merge). Serialize only when the next step depends on the CONTENT of the previous result.
+- Do not resume a long-lived agent. Once its context has passed ~150k tokens, or it was already resumed in an earlier session, spawn a fresh one with a written summary in `./.workflow/scratch/` instead of sending it another message — every resumed turn re-reads that agent's entire history.
 - Producers run only the targeted tests while iterating and the full gate once at the end, saving its output to `./.workflow/scratch/` so the verifier reads it instead of re-running it.
 - Skip delegation for genuinely small work: a conversational turn, reading up to 3 files, a one-shot lookup where you already know the file, a one-line edit, a single verification command. Past that the block belongs to an agent — "it's faster if I just do it" applied to a multi-step block is exactly the failure mode this policy exists to prevent.
 
