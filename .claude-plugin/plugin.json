@@ -1,6 +1,6 @@
 {
   "name": "fable-relay",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Fable 5 as a token-frugal orchestrator: tiered Opus/Sonnet/Haiku agents, a hook-enforced Requirements Ledger, filesystem-as-shared-memory, and mandatory fresh-eyes verification.",
   "author": {
     "name": "SummerRiversound"
