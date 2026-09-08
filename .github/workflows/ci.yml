@@ -32,6 +32,22 @@ jobs:
           out=$(echo '{"session_id":"ci-stop","cwd":"/tmp/p","stop_hook_active":false}' \
             | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_stop.py)
           test -z "$out"
+          # stop guard: another session's ledger (this session never wrote it) -> silent
+          printf '%s\n' '{"type":"user","message":{"content":"just looking around"}}' > /tmp/t-visitor.jsonl
+          out=$(echo '{"session_id":"ci-h2","cwd":"/tmp/p","stop_hook_active":false,"transcript_path":"/tmp/t-visitor.jsonl"}' \
+            | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_stop.py)
+          test -z "$out"
+          # stop guard: our ledger, but a spawned agent has not reported back -> silent
+          printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Edit","id":"e1","input":{"file_path":"/tmp/p/.workflow/LEDGER.md"}}]}}' > /tmp/t-waiting.jsonl
+          printf '%s\n' '{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"toolu_a","content":"Async agent launched successfully."}]}}' >> /tmp/t-waiting.jsonl
+          out=$(echo '{"session_id":"ci-h1","cwd":"/tmp/p","stop_hook_active":false,"transcript_path":"/tmp/t-waiting.jsonl"}' \
+            | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_stop.py)
+          test -z "$out"
+          # stop guard: our ledger and the agent reported back -> block
+          cp /tmp/t-waiting.jsonl /tmp/t-closing.jsonl
+          printf '%s\n' '{"type":"user","message":{"content":"<task-notification><tool-use-id>toolu_a</tool-use-id><status>completed</status></task-notification>"}}' >> /tmp/t-closing.jsonl
+          echo '{"session_id":"ci-h3","cwd":"/tmp/p","stop_hook_active":false,"transcript_path":"/tmp/t-closing.jsonl"}' \
+            | python3 $GITHUB_WORKSPACE/scripts/ledger_guard_stop.py | grep -q '"block"'
           # inline counter: fires at 4
           for i in 1 2 3 4; do
             last=$(echo '{"tool_name":"Read","session_id":"ci-cnt"}' | bash $GITHUB_WORKSPACE/hooks/inline-counter.sh)

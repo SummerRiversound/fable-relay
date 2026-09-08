@@ -17,6 +17,14 @@ two guards always agree on whether a session has a ledger.
 Fenced code blocks are excluded: a ``` example checklist in the ledger's
 notes is not an open item.
 
+Two silences, both measured: over 8 days every single fire landed either
+while a spawned agent was still working (the chair parking a turn, not
+closing one) or on a ledger a different session had written. So the guard
+stays quiet while an async spawn has not reported back, and quiet unless
+this session wrote the ledger itself. Neither silence spends the
+once-per-session reminder. Without a readable transcript both checks are
+skipped and the guard behaves as before.
+
 Configuration:
     FABLE_RELAY_STOP_MODE=every-turn   restore per-turn blocking
 """
@@ -28,6 +36,9 @@ import tempfile
 import time
 
 OPEN_ITEM_RE = r"^\s*[-*] \[ \](?:\s.*)?$"
+NOTIFICATION_RE = re.compile(r"<tool-use-id>(toolu_[A-Za-z0-9_-]+)</tool-use-id>")
+LEDGER_WRITE_TOOLS = ("Edit", "Write", "NotebookEdit", "MultiEdit", "Bash")
+TRANSCRIPT_TAIL_BYTES = 4 * 1024 * 1024
 
 
 def stop_sidecar_path(session_id):
@@ -95,6 +106,77 @@ def _outside_fences(text):
     return "\n".join(kept)
 
 
+def transcript_entries(transcript_path):
+    """Parsed entries from the tail of the session transcript, or None."""
+    if not isinstance(transcript_path, str) or not os.path.isfile(transcript_path):
+        return None
+    try:
+        size = os.path.getsize(transcript_path)
+        with open(transcript_path, "rb") as f:
+            f.seek(max(0, size - TRANSCRIPT_TAIL_BYTES))
+            data = f.read()
+    except OSError:
+        return None
+    lines = data.decode("utf-8", errors="replace").splitlines()
+    if size > TRANSCRIPT_TAIL_BYTES and lines:
+        lines = lines[1:]  # a tail read starts mid-line
+    entries = []
+    for line in lines:
+        try:
+            entry = json.loads(line)
+        except Exception:
+            continue
+        if isinstance(entry, dict):
+            entries.append(entry)
+    return entries
+
+
+def _blocks(entry):
+    message = entry.get("message")
+    if not isinstance(message, dict):
+        return []
+    content = message.get("content")
+    return [b for b in content if isinstance(b, dict)] if isinstance(content, list) else []
+
+
+def agents_still_running(entries):
+    """True while a spawned agent has not reported back.
+
+    An Agent/Task spawn returns "Async agent launched successfully" at once and
+    reports later as a `<task-notification>` user message carrying the spawn's
+    tool-use id. A launch with no notification is still working — the chair is
+    waiting, not closing. Spawns that return their result directly never enter
+    the launched set, so synchronous hosts keep the old behaviour.
+    """
+    launched, reported = set(), set()
+    for entry in entries:
+        for block in _blocks(entry):
+            if block.get("type") != "tool_result":
+                continue
+            if "Async agent launched" in json.dumps(block.get("content"), default=str):
+                launched.add(block.get("tool_use_id"))
+        if entry.get("type") == "user":
+            reported.update(NOTIFICATION_RE.findall(json.dumps(entry.get("message"), default=str)))
+    return bool(launched - reported)
+
+
+def session_wrote_ledger(entries, ledger):
+    """True when this session edited the ledger itself.
+
+    A session that only searched or answered questions in a folder someone
+    else left a ledger in is not closing that ledger's work. Spawn prompts
+    quote item numbers constantly, so only file-touching tools count.
+    """
+    name = os.path.basename(ledger)
+    for entry in entries:
+        for block in _blocks(entry):
+            if block.get("type") != "tool_use" or block.get("name") not in LEDGER_WRITE_TOOLS:
+                continue
+            if name in json.dumps(block.get("input"), default=str):
+                return True
+    return False
+
+
 def _read_blocked(path):
     try:
         with open(path, encoding="utf-8") as f:
@@ -142,6 +224,13 @@ def run_guard(data):
     open_items = re.findall(OPEN_ITEM_RE, _outside_fences(text), flags=re.M)
     if not open_items:
         return
+
+    entries = transcript_entries(data.get("transcript_path"))
+    if entries is not None:
+        if agents_still_running(entries):
+            return  # the turn is a pause in delegated work, not a close
+        if not session_wrote_ledger(entries, ledger):
+            return  # someone else's ledger; this session is a visitor here
 
     session_id = data.get("session_id")
     mode = (os.environ.get("FABLE_RELAY_STOP_MODE") or "once-per-session").strip().lower()
