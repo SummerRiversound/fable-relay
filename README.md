@@ -88,7 +88,7 @@ Set them in `~/.claude/settings.json` under `"env"`.
 This plugin is a deliberate synthesis of four designs:
 
 - [realgarit/fable-baton](https://github.com/realgarit/fable-baton) — the 4-tier agent skeleton, the three soft-enforcement layers, tier auto-detection, and "skills define WHAT, not WHO".
-- [Rylaa/fable5-orchestrator](https://github.com/Rylaa/fable5-orchestrator) — the Requirements Ledger, both guard hooks, filesystem-as-shared-memory, effort routing, and mandatory fresh-eyes verification.
+- [Rylaa/fable5-orchestrator](https://github.com/Rylaa/fable5-orchestrator) — the Requirements Ledger, both guard hooks, filesystem-as-shared-memory, effort routing, and scoped fresh-eyes verification.
 - [DannyMac180/fable-advisor](https://github.com/DannyMac180/fable-advisor) — the five-part spec contract, the "empty diff is never complete" rule, and structured report formats.
 - [barkain/claude-code-workflow-orchestration](https://github.com/barkain/claude-code-workflow-orchestration) — escalating-nudge philosophy and the lean-injection lesson (keep session-start cost small).
 
