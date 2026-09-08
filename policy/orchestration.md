@@ -33,7 +33,7 @@ If a task is mostly searching, reading, editing, testing, or verifying, it belon
 
 The Agent tool is not the only delegation vehicle. Classify before delegating:
 
-- **Inline (you):** conversational turns, one single-fact lookup, a one-line edit.
+- **Inline (you):** conversational turns, reading up to 3 files, a one-shot lookup, a one-line edit, a single verification command.
 - **Single Agent spawn:** one self-contained chunk (one discovery pass, one scoped implementation), or sequential work where the next step depends on your judgment of the previous result.
 - **Workflow script:** the control flow can be written as code before starting — same-shaped fan-out over a work-list (≥3 independent lanes) (lanes editing the same files still count as independent — give them `isolation: 'worktree'`), multi-stage pipelines (find → verify → synthesize), loop-until-dry discovery. Prefer Workflow over hand-issuing parallel Agent calls there: `pipeline()`/`parallel()` handle ordering and concurrency deterministically.
 
@@ -62,11 +62,11 @@ Auth, billing, permissions, security-sensitive code, migrations, data loss, shar
 - Give each agent only the context it needs — focused prompts, focused results. A good spawn carries the five-part spec: objective, files, interfaces, constraints, verification command.
 - Run independent delegations in parallel (one message, multiple spawns); keep dependent ones sequential. File overlap is NOT a reason to serialize — run overlapping edit work in parallel with `isolation: 'worktree'` (each agent edits its own copy; you merge). Serialize only when the next step depends on the CONTENT of the previous result.
 - Producers run only the targeted tests while iterating and the full gate once at the end, saving its output to `./.workflow/scratch/` so the verifier reads it instead of re-running it.
-- Skip delegation only for genuinely trivial work: a conversational turn, one single-fact lookup where you already know the file, a one-line edit. This exemption covers one tool call, not a block of them — "it's faster if I just do it" applied to a multi-step block is exactly the failure mode this policy exists to prevent.
+- Skip delegation for genuinely small work: a conversational turn, reading up to 3 files, a one-shot lookup where you already know the file, a one-line edit, a single verification command. Past that the block belongs to an agent — "it's faster if I just do it" applied to a multi-step block is exactly the failure mode this policy exists to prevent.
 
 ## Staying on policy
 
-- **Tripwire:** if you are about to make a 3rd consecutive inline Bash/Read/Grep/Edit call, stop — you have taken an agent's job. Hand the rest of that block to `scout` (discovery) or `executor` (edits). A PostToolUse counter hook watches inline streaks independently and injects the same notice once the streak crosses the threshold — act on that notice immediately, don't just acknowledge it.
+- **Tripwire:** if you are about to make a 10th consecutive inline Bash/Read/Grep/Edit call, stop — you have taken an agent's job. Hand the rest of that block to `scout` (discovery) or `executor` (edits). A PostToolUse counter hook watches inline streaks independently and injects the same notice once the streak crosses the threshold — act on that notice immediately, don't just acknowledge it.
 - **Skills do not override routing.** An invoked skill defines WHAT to do, never WHO does it. Follow the skill's process, but route its mechanical steps — scanning files, applying edits, running checks — to agents like any other work.
 - **After compaction or a long stretch of work, this policy still applies.** The per-prompt reminder is your cue to re-check. The ledger and scratch files are your recovery points — re-read them instead of trusting your memory of the conversation.
 - The user can suspend orchestration anytime by saying so (e.g. "don't delegate in this session"); their instructions win over this policy.

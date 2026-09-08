@@ -1,7 +1,7 @@
 #!/bin/bash
 # fable-relay PostToolUse hook: deterministically count consecutive inline tool
 # calls (Bash/Read/Grep/Glob/Edit/Write/NotebookEdit) and inject a delegation
-# notice once the count crosses FABLE_RELAY_TRIPWIRE (default 4), then every
+# notice once the count crosses FABLE_RELAY_TRIPWIRE (default 10), then every
 # 6 calls after that. Agent/Task calls reset the counter to 0. Subagent calls
 # are ignored entirely. Any parse failure or unrecognized tool is a silent
 # no-op - this must never break a session.
@@ -68,9 +68,9 @@ def main():
         return
 
     try:
-        threshold = int(os.environ.get("FABLE_RELAY_TRIPWIRE", "4"))
+        threshold = int(os.environ.get("FABLE_RELAY_TRIPWIRE", "10"))
     except Exception:
-        threshold = 4
+        threshold = 10
 
     if count >= threshold and (count - threshold) % 6 == 0:
         if tier == "sonnet":

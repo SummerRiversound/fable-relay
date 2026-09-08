@@ -121,7 +121,7 @@ EOF
     ;;
   opus)
     cat <<'EOF'
-[fable-relay] Delegation check (Opus chair): searching, reading, editing, testing, and verifying go to the cheaper agents (scout, executor, verifier); architect is your own tier - only for context isolation or a second opinion. Ledger before substantial delegation. Tripwire: a 3rd consecutive inline Bash/Read/Grep/Edit call means that block belongs to an agent. Skills define what to do, not who does it.
+[fable-relay] Delegation check (Opus chair): searching, reading, editing, testing, and verifying go to the cheaper agents (scout, executor, verifier); architect is your own tier - only for context isolation or a second opinion. Ledger before substantial delegation. Tripwire: a 10th consecutive inline Bash/Read/Grep/Edit call means that block belongs to an agent. Skills define what to do, not who does it.
 EOF
     ;;
   haiku)
@@ -131,7 +131,7 @@ EOF
     ;;
   *)
     cat <<'EOF'
-[fable-relay] Delegation check: searching, reading, editing, testing, and verifying go to agents (scout, executor, architect, verifier); you keep judgment, the Ledger, decisions, and the final answer. Deep thinking goes into spawn EFFORT, not inline grind. Tripwire: a 3rd consecutive inline Bash/Read/Grep/Edit call means that block belongs to an agent. Skills define what to do, not who does it. Exempt: conversational turns, one quick lookup, a one-line edit.
+[fable-relay] Delegation check: searching, reading, editing, testing, and verifying go to agents (scout, executor, architect, verifier); you keep judgment, the Ledger, decisions, and the final answer. Deep thinking goes into spawn EFFORT, not inline grind. Tripwire: a 10th consecutive inline Bash/Read/Grep/Edit call means that block belongs to an agent. Skills define what to do, not who does it. Exempt: conversational turns, reading up to 3 files, a one-shot lookup, a one-line edit, a single verification command.
 EOF
     ;;
 esac

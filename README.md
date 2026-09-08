@@ -28,7 +28,7 @@ Two problems, one design:
 
 - **SessionStart** injects the orchestration policy, auto-detecting the chair's tier (Fable/Opus/Sonnet/Haiku) and appending a tier adaptation so the cost logic stays correct even mid-session-switcheroo.
 - **UserPromptSubmit** re-asserts a one-line tier-aware reminder every turn.
-- **PostToolUse** deterministically counts consecutive inline tool calls and injects a delegation notice once the streak crosses `FABLE_RELAY_TRIPWIRE` (default 4). Agent/Task calls reset it.
+- **PostToolUse** deterministically counts consecutive inline tool calls and injects a delegation notice once the streak crosses `FABLE_RELAY_TRIPWIRE` (default 10). Agent/Task calls reset it, and subagent calls are ignored.
 
 **Two hard guard hooks** — they fence the two ends of the failure pipeline, where details die entering and leaving the workflow:
 
@@ -71,7 +71,7 @@ Nothing. Every new chat starts with the policy loaded and the agents available. 
 
 | Env var | Default | Meaning |
 |---|---|---|
-| `FABLE_RELAY_TRIPWIRE` | `4` | Consecutive inline tool calls before the counter notice fires |
+| `FABLE_RELAY_TRIPWIRE` | `10` | Consecutive inline tool calls before the counter notice fires |
 | `FABLE_RELAY_LEDGER_THRESHOLD` | `1500` | Spawn-prompt chars above which a delegation requires a ledger |
 | `FABLE_RELAY_STOP_MODE` | `once-per-session` | Set `every-turn` for legacy per-turn close blocking |
 
