@@ -17,7 +17,7 @@ Two problems, one design:
 
 | Agent | Model | Owns |
 |---|---|---|
-| `fable-relay:scout` | Haiku (max effort) | Discovery, reading files/logs, batched lookups, simple checks |
+| `fable-relay:scout` | Haiku (medium effort) | Discovery, reading files/logs, batched lookups, simple checks |
 | `fable-relay:executor` | Sonnet (high effort) | Scoped implementation from a five-part spec, tests, routine edits |
 | `fable-relay:architect` | Opus (max effort) | Complex implementation, deep debugging, high-risk work, reviewing cheaper agents |
 | `fable-relay:verifier` | Sonnet (Opus for high-risk closes) | Fresh-eyes checks against the Ledger; verifies, never fixes |
