@@ -39,11 +39,11 @@ The Agent tool is not the only delegation vehicle. Classify before delegating:
 
 One-line test: if the inter-stage flow is scriptable up front, use Workflow; if each step needs your judgment in between, use sequential Agent spawns.
 
-Inside a Workflow script, the tier table still applies via `agent()` opts: mechanical lanes (search, read, transform, apply a known edit) get `model: 'sonnet', effort: 'low'`; deciding lanes (adversarial verification, synthesis, anything you will act on unread) keep the session model with `effort: 'high'`. Use `agentType` (e.g. `'fable-relay:scout'`, `'fable-relay:executor'`) to keep the tier prompts. Rule 1 applies unchanged: write the Ledger before launching a workflow, and item V. still closes only on fresh-eyes verification.
+Inside a Workflow script, the tier table still applies via `agent()` opts: mechanical lanes (search, read, transform, apply a known edit) get `model: 'sonnet', effort: 'low'`; deciding lanes (adversarial verification, synthesis, anything you will act on unread) keep the session model with `effort: 'high'`. Use `agentType` (e.g. `'fable-relay:scout'`, `'fable-relay:executor'`) to keep the tier prompts. Rule 1 applies unchanged: write the Ledger before launching a workflow, and item V. still closes on evidence, never on a lane's own summary.
 
 ## Rule 1 — Requirements Ledger (hook-enforced)
 
-Before any substantial delegation, write every explicit requirement, implicit expectation, constraint, and edge case to `./.workflow/LEDGER.md` — one `- [ ] N. <item>` line each. `- [x]` only when addressed AND verified; `- [~] deferred: <reason>` only with user approval. The LAST item is always `- [ ] V. fresh-eyes verification passed`, and only the verifier's evidence closes it. Delegation prompts cite item numbers; append discoveries as new items; ambiguity → ASK THE USER. Write the ledger and the first delegation wave in ONE message.
+Before any substantial delegation, write every explicit requirement, implicit expectation, constraint, and edge case to `./.workflow/LEDGER.md` — one `- [ ] N. <item>` line each. `- [x]` only when addressed AND verified; `- [~] deferred: <reason>` only with user approval. The LAST item is always `- [ ] V. fresh-eyes verification passed`, and only evidence closes it (see Verification). Delegation prompts cite item numbers; append discoveries as new items; ambiguity → ASK THE USER. Write the ledger and the first delegation wave in ONE message.
 
 Hooks enforce the two ends of this pipeline: a detailed spawn (>1500 chars) is denied while the ledger is missing, and the turn cannot close while any `- [ ]` remains open (held once, with the open items listed).
 
@@ -74,7 +74,7 @@ Auth, billing, permissions, security-sensitive code, migrations, data loss, shar
 
 ## Verification — before closing
 
-Only a FRESH verifier that did not build the work closes item `V.`; the producer's summary is never proof, and the verifier checks against the Ledger, not against what the author says. Spawn one where fresh eyes have something to read:
+Item `V.` closes on evidence read by someone other than the producer — a producer's summary is never proof. A FRESH verifier that did not build the work is that someone whenever the rules below call for one, checking against the Ledger rather than against what the author says; where they do not, item `V.` closes on the producer's saved gate output plus your own read of the diff. Spawn a verifier where fresh eyes have something to read:
 
 - **A repo diff, or a document whose claims cite evidence** (review drafts, audit reports, design docs). A code diff of ~300 lines or more, and anything in a high-risk area at any size, gets a verifier. Under ~300 lines, outside high-risk areas, with the producer's gate already green: skip the verifier and read the diff yourself.
 - **External state is not verifier work.** Notion pages, issue registration, plugin lists, clone and setup steps — check those yourself with a few commands, or send a `scout` with a checklist. There is no diff for fresh eyes to read.

@@ -37,7 +37,7 @@ Two problems, one design:
 | **Spawn guard** (`PreToolUse` on `Agent\|Task`) | A detailed delegation (spawn prompt > 1500 chars) while no live `./.workflow/LEDGER*.md` exists | The spawn is denied with instructions: write the numbered ledger first. Short prompts (quick scouts) always pass. Forks are exempt (they inherit the ledger through context). |
 | **Close guard** (`Stop`) | The turn ends while the ledger has open `- [ ]` items | The stop is held once per session, with the open items listed. `- [x]` (done + verified) and `- [~] deferred: <reason>` count as closed. |
 
-**Ledger format** — the last item is always the verification gate, and only the verifier's evidence closes it:
+**Ledger format** — the last item is always the verification gate, and only evidence closes it:
 
 ```
 - [ ] 1. Every explicit requirement, one line each
