@@ -1,0 +1,144 @@
+[
+  {
+    "task": "csvstats",
+    "arm": "off",
+    "model": "claude-fable-5-1",
+    "met": 10,
+    "total": 10,
+    "missed": [],
+    "cost_usd": 0.63,
+    "cost_by_model": {
+      "claude-fable-5-1": 0.63
+    },
+    "output_tokens_by_model": {
+      "claude-fable-5-1": 3980
+    },
+    "wall_s": 47,
+    "turns": 3,
+    "spawns": 0,
+    "ledger": false,
+    "spawn_denied": 0,
+    "stop_held": 0,
+    "is_error": false,
+    "stop_reason": "success"
+  },
+  {
+    "task": "csvstats",
+    "arm": "on",
+    "model": "claude-fable-5-1",
+    "met": 10,
+    "total": 10,
+    "missed": [],
+    "cost_usd": 1.11,
+    "cost_by_model": {
+      "claude-fable-5-1": 0.77,
+      "claude-sonnet-5-5": 0.34
+    },
+    "output_tokens_by_model": {
+      "claude-fable-5-1": 3982,
+      "claude-sonnet-5-5": 16819
+    },
+    "wall_s": 203,
+    "turns": 7,
+    "spawns": 3,
+    "ledger": true,
+    "spawn_denied": 1,
+    "stop_held": 0,
+    "is_error": false,
+    "stop_reason": "success"
+  },
+  {
+    "task": "slug",
+    "arm": "off",
+    "model": "claude-fable-5-1",
+    "met": 10,
+    "total": 10,
+    "missed": [],
+    "cost_usd": 0.48,
+    "cost_by_model": {
+      "claude-fable-5-1": 0.48
+    },
+    "output_tokens_by_model": {
+      "claude-fable-5-1": 1993
+    },
+    "wall_s": 26,
+    "turns": 2,
+    "spawns": 0,
+    "ledger": false,
+    "spawn_denied": 0,
+    "stop_held": 0,
+    "is_error": false,
+    "stop_reason": "success"
+  },
+  {
+    "task": "slug",
+    "arm": "on",
+    "model": "claude-fable-5-1",
+    "met": 10,
+    "total": 10,
+    "missed": [],
+    "cost_usd": 0.66,
+    "cost_by_model": {
+      "claude-fable-5-1": 0.66
+    },
+    "output_tokens_by_model": {
+      "claude-fable-5-1": 3925
+    },
+    "wall_s": 64,
+    "turns": 3,
+    "spawns": 1,
+    "ledger": false,
+    "spawn_denied": 1,
+    "stop_held": 0,
+    "is_error": false,
+    "stop_reason": "success"
+  },
+  {
+    "task": "todo",
+    "arm": "off",
+    "model": "claude-fable-5-1",
+    "met": 10,
+    "total": 10,
+    "missed": [],
+    "cost_usd": 0.62,
+    "cost_by_model": {
+      "claude-fable-5-1": 0.62
+    },
+    "output_tokens_by_model": {
+      "claude-fable-5-1": 3614
+    },
+    "wall_s": 47,
+    "turns": 4,
+    "spawns": 0,
+    "ledger": false,
+    "spawn_denied": 0,
+    "stop_held": 0,
+    "is_error": false,
+    "stop_reason": "success"
+  },
+  {
+    "task": "todo",
+    "arm": "on",
+    "model": "claude-fable-5-1",
+    "met": 10,
+    "total": 10,
+    "missed": [],
+    "cost_usd": 1.32,
+    "cost_by_model": {
+      "claude-fable-5-1": 0.97,
+      "claude-sonnet-5-5": 0.35
+    },
+    "output_tokens_by_model": {
+      "claude-fable-5-1": 5952,
+      "claude-sonnet-5-5": 17611
+    },
+    "wall_s": 405,
+    "turns": 8,
+    "spawns": 3,
+    "ledger": true,
+    "spawn_denied": 1,
+    "stop_held": 0,
+    "is_error": false,
+    "stop_reason": "success"
+  }
+]

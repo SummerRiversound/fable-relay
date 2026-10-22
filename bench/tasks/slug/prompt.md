@@ -1,0 +1,5 @@
+Create `slug.py` in the current directory with a `slugify(text, max_len=DEFAULT_MAX_LEN)` function for URL slugs. The default length lives in a module constant named `DEFAULT_MAX_LEN` set to 50. Slugs are lowercase, accented letters are transliterated to plain ASCII ("Crème Brûlée" becomes "creme-brulee"), and any run of whitespace or punctuation turns into a single hyphen, with no hyphen at either end. When the slug is longer than `max_len`, cut it to `max_len` characters, and make sure the cut never leaves a trailing hyphen. If nothing usable is left (for example the input is "!!!"), return "n-a".
+
+Also add `unique_slug(text, existing)`, where `existing` is a set of slugs already taken. It returns the plain slug when it is free, otherwise the first free one of `slug-2`, `slug-3`, and so on. It must not modify the set it is given.
+
+Every public function needs a docstring and type hints on its parameters and return value. Add a few tests in `test_slug.py` that pass with `python3 -m unittest`. Standard library only. Do not ask questions; finish the task.
