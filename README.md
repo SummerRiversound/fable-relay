@@ -1,15 +1,15 @@
 # fable-relay 🏃
 
-**Fable 5 holds the baton. The ledger keeps the score. Fresh eyes call the finish.**
+**Requirements that hooks keep track of, for a Fable 5 session that hands its work to Haiku, Sonnet and Opus agents.**
 
-A Claude Code plugin that makes Fable 5 a token-frugal orchestrator. The chair keeps the judgment — intent, architecture, decomposition, tradeoffs, final review — running at low-to-medium effort. Tiered subagents on Opus, Sonnet, and Haiku do the labor at whatever effort the task demands. A hook-enforced Requirements Ledger stops silent detail loss, and every close with a diff worth checking gets fresh-eyes verification.
+fable-relay runs Fable 5 as the orchestrator at low-to-medium effort and sends the labor to four subagents, each pinned to a model. Every requirement of a task goes into a numbered Requirements Ledger, and two hooks hold the session to it: one refuses a detailed delegation until the ledger exists, the other holds the end of a turn, once per session, while ledger items are open. Large or high-risk changes also get a separate verifier that checks them against the ledger.
 
 ## Why
 
-Two problems, one design:
+Delegation loses details on the way down. A request turns into a plan, the plan into spawn prompts, and an edge case or a naming rule drops out at one of those steps. The subagent's report reads as finished either way, so the gap shows up only when someone uses the result. fable-relay makes that the main thing to guard, and cost the second.
 
-1. **Cost routing.** Fable 5 is the strongest model on a Claude subscription and the most expensive one to burn on grep runs and boilerplate. Each piece of work goes to the cheapest tier that can do it well — and deep reasoning goes into the *effort of the spawn*, never into the chair grinding inline.
-2. **Silent detail loss.** Naive delegation has a failure mode worse than the cost it saves: requirements vanish at the task→plan translation step, subagents return confident summaries, and nobody notices what got dropped until it ships broken. The Requirements Ledger makes detail loss *visible* — and two guard hooks make the ledger *mechanical*, not advisory.
+- **The ledger is enforced by hooks, not just asked for.** The spawn guard runs before Agent, Task and Workflow calls, so a long Workflow script needs a ledger just as a long spawn prompt does. The close guard lists the open items before the turn may end. Rylaa's orchestrator, where the ledger and both gates come from, later removed them in favour of a gate on solo editing; fable-relay keeps them.
+- **Routing follows whichever model is in the chair.** As in fable-baton, the SessionStart hook detects whether Fable, Opus, Sonnet or Haiku runs the session and adjusts the routing table, so an Opus or Sonnet session does not keep handing work to a tier that costs the same or more.
 
 ## How it works
 
@@ -76,6 +76,10 @@ Nothing. Every new chat starts with the policy loaded and the agents available. 
 | `FABLE_RELAY_STOP_MODE` | `once-per-session` | Set `every-turn` for legacy per-turn close blocking |
 
 Set them in `~/.claude/settings.json` under `"env"`.
+
+## Measured overhead
+
+A small headless benchmark ([bench/](bench/)) ran three ten-requirement coding tasks with the same Fable 5 session model, once without the plugin and once with it. Both arms met all 30 requirements. With the plugin the runs cost 1.4 to 2.1 times as much and took 2.5 to 8.6 times as long, and Fable's own output tokens did not fall. On tasks this small the ledger and guards are pure overhead; whether they pay off on longer multi-phase work is not measured yet. One run per cell, so the numbers are directional.
 
 ## Honest limitations
 

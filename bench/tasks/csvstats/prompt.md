@@ -1,0 +1,5 @@
+Write a small Python module `csvstats.py` in the current directory. It needs a function `summarize(path, column)` that reads a CSV file with a header row and returns a dict with exactly the keys `count`, `mean`, `median`, `min` and `max` for the numbers in that column. Cells that are blank or not numbers should be skipped, not counted. When the count is even, the median is the average of the two middle values. Round the mean to 2 decimal places. If the column has no numeric values at all, return `count` 0 and `None` for the other four keys. If the column does not exist, raise a `KeyError` whose message includes the column name.
+
+It should also work from the command line as `python3 csvstats.py FILE COLUMN`, printing the result as JSON with the keys sorted. For a missing column the CLI prints an error message to stderr (nothing on stdout) and exits with code 2.
+
+Add a README.md with a "Usage" section that shows an example command, and a `test_csvstats.py` with at least three tests that pass with `python3 -m unittest`. Standard library only. Do not ask questions; finish the task.
