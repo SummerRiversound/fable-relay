@@ -18,9 +18,9 @@ Two problems, one design:
 | Agent | Model | Owns |
 |---|---|---|
 | `fable-relay:scout` | Haiku (medium effort) | Discovery, reading files/logs, batched lookups, simple checks |
-| `fable-relay:executor` | Sonnet (high effort) | Scoped implementation from a five-part spec, tests, routine edits |
-| `fable-relay:architect` | Opus (max effort) | Complex implementation, deep debugging, high-risk work, reviewing cheaper agents |
-| `fable-relay:verifier` | Sonnet (Opus for high-risk closes) | Fresh-eyes checks against the Ledger; verifies, never fixes |
+| `fable-relay:executor` | Sonnet (xhigh effort) | Scoped implementation from a five-part spec, tests, routine edits |
+| `fable-relay:architect` | Opus (xhigh effort) | Complex implementation, deep debugging, high-risk work, reviewing cheaper agents |
+| `fable-relay:verifier` | Sonnet, xhigh effort (Opus for high-risk closes) | Fresh-eyes checks against the Ledger; verifies, never fixes |
 
 **Verification is scoped, not automatic.** A fresh verifier runs on a repo diff of ~300 lines or more, on anything high-risk at any size, and on documents whose claims cite evidence. Smaller green-gated diffs close on the chair reading the diff, and external state (issue lists, setup steps) is checked with a few commands instead. The verifier reads the producer's saved gate output rather than re-running it.
 
@@ -28,13 +28,13 @@ Two problems, one design:
 
 - **SessionStart** injects the orchestration policy, auto-detecting the chair's tier (Fable/Opus/Sonnet/Haiku) and appending a tier adaptation so the cost logic stays correct even mid-session-switcheroo.
 - **UserPromptSubmit** re-asserts a one-line tier-aware reminder every turn.
-- **PostToolUse** deterministically counts consecutive inline tool calls and injects a delegation notice once the streak crosses `FABLE_RELAY_TRIPWIRE` (default 10). Agent/Task calls reset it, and subagent calls are ignored.
+- **PostToolUse** deterministically counts consecutive inline tool calls and injects a delegation notice once the streak crosses `FABLE_RELAY_TRIPWIRE` (default 10). Agent/Task/Workflow calls reset it, and subagent calls are ignored.
 
 **Two hard guard hooks** — they fence the two ends of the failure pipeline, where details die entering and leaving the workflow:
 
 | Guard | Trigger | Effect |
 |---|---|---|
-| **Spawn guard** (`PreToolUse` on `Agent\|Task`) | A detailed delegation (spawn prompt > 1500 chars) while no live `./.workflow/LEDGER*.md` exists | The spawn is denied with instructions: write the numbered ledger first. Short prompts (quick scouts) always pass. Forks are exempt (they inherit the ledger through context). |
+| **Spawn guard** (`PreToolUse` on `Agent\|Task\|Workflow`) | A detailed delegation (spawn prompt or Workflow script > 1500 chars) while no live `./.workflow/LEDGER*.md` exists | The spawn is denied with instructions: write the numbered ledger first. Short prompts (quick scouts) always pass. Forks are exempt (they inherit the ledger through context). |
 | **Close guard** (`Stop`) | The turn ends while the ledger has open `- [ ]` items | The stop is held once per session, with the open items listed. `- [x]` (done + verified) and `- [~] deferred: <reason>` count as closed. |
 
 **Ledger format** — the last item is always the verification gate, and only evidence closes it:
@@ -52,7 +52,7 @@ Two problems, one design:
 ## Install
 
 ```
-/plugin marketplace add SummerRiversound/fable-relay
+/plugin marketplace add https://github.com/SummerRiversound/fable-relay.git
 /plugin install fable-relay@fable-relay
 ```
 
@@ -88,7 +88,7 @@ Set them in `~/.claude/settings.json` under `"env"`.
 This plugin is a deliberate synthesis of four designs:
 
 - [realgarit/fable-baton](https://github.com/realgarit/fable-baton) — the 4-tier agent skeleton, the three soft-enforcement layers, tier auto-detection, and "skills define WHAT, not WHO".
-- [Rylaa/fable5-orchestrator](https://github.com/Rylaa/fable5-orchestrator) — the Requirements Ledger, both guard hooks, filesystem-as-shared-memory, effort routing, and scoped fresh-eyes verification.
+- [Rylaa/fable5-opus5.5-orchestrator](https://github.com/Rylaa/fable5-opus5.5-orchestrator) — the Requirements Ledger, both guard hooks, filesystem-as-shared-memory, effort routing, and scoped fresh-eyes verification.
 - [DannyMac180/fable-advisor](https://github.com/DannyMac180/fable-advisor) — the five-part spec contract, the "empty diff is never complete" rule, and structured report formats.
 - [barkain/claude-code-workflow-orchestration](https://github.com/barkain/claude-code-workflow-orchestration) — escalating-nudge philosophy and the lean-injection lesson (keep session-start cost small).
 
